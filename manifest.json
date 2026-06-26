@@ -1,0 +1,20 @@
+{
+  "name": "18th Birthday Diary",
+  "short_name": "Diary",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fce4ec",
+  "theme_color": "#ffb6c1",
+  "icons": [
+    {
+      "src": "cat.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "cat.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

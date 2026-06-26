@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 18th Birthday!</title>
+    
+    <!-- PWA Config -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ffb6c1">
+    <link rel="apple-touch-icon" href="images.jpeg">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600&family=Fredoka:wght@400;500;600&family=Pacifico&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf for Keepsake Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #ffb6c1; 
+            --secondary: #ff9fb2; 
+            --bg-color: #ffeef2;
+            --bg-outer: #fce4ec;
+            --text-main: #d35467;
+            --text-muted: #888;
+            --card-bg: white;
+            --modal-bg: repeating-linear-gradient(transparent, transparent 27px, #ffb6c1 28px), #fff;
+            --font-main: 'Fredoka', sans-serif;
+            --font-cursive: 'Pacifico', cursive;
+            --font-handwritten: 'Caveat', cursive;
+        }
+
+        body.dark-theme {
+            --primary: #833a4c; 
+            --secondary: #a34a62; 
+            --bg-color: #2a161f;
+            --bg-outer: #170b10;
+            --text-main: #ffb6c1;
+            --text-muted: #aaa;
+            --card-bg: #3d212d;
+            --modal-bg: repeating-linear-gradient(transparent, transparent 27px, #4a2333 28px), #2d1b24;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-outer);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: var(--font-main);
+            transition: background-color 0.5s;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            background: rgba(211, 84, 103, 0.9); color: white; padding: 12px 25px; border-radius: 30px;
+            z-index: 1000; font-family: var(--font-main); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-weight: 600; text-align: center;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        /* Container imitating a phone/diary */
+        #app-container {
+            width: 100%;
+            max-width: 414px;
+            height: 100vh;
+            max-height: 896px;
+            background-color: var(--bg-color);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.5s, box-shadow 0.5s;
+        }
+
+        @media (min-width: 450px) {
+            #app-container {
+                height: 90vh;
+                border-radius: 30px;
+                border: 8px solid var(--card-bg);
+            }
+        }
+
+        /* Lock Screen */
+        #lock-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--bg-color), var(--primary));
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s;
+        }
+
+        #lock-screen.unlocked {
+            transform: translateY(-100%);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cat-container {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .cat-frame {
+            width: 180px;
+            height: 220px;
+            border-radius: 100px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px dashed var(--text-main);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .cat-frame img {
+            position: absolute;
+            top: 8px; left: 8px;
+            width: calc(100% - 16px);
+            height: calc(100% - 16px);
+            object-fit: cover;
+            border-radius: 90px;
+            opacity: 0;
+            animation: slideFade 24s infinite;
+        }
+        .cat-frame .s1 { animation-delay: 0s; }
+        .cat-frame .s2 { animation-delay: 4s; }
+        .cat-frame .s3 { animation-delay: 8s; }
+        .cat-frame .s4 { animation-delay: 12s; }
+        .cat-frame .s5 { animation-delay: 16s; }
+        .cat-frame .s6 { animation-delay: 20s; }
+
+        @keyframes slideFade {
+            0% { opacity: 0; transform: scale(1.05); }
+            5% { opacity: 1; transform: scale(1); }
+            16.66% { opacity: 1; transform: scale(1); }
+            21.66% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 0; }
+        }
+
+        .heart-deco {
+            position: absolute;
+            color: #ff4d6d;
+            font-size: 24px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .h-1 { top: -10px; left: -10px; animation-delay: 0s; }
+        .h-2 { top: 20px; right: -20px; animation-delay: 1s; font-size: 20px; }
+        .h-3 { bottom: 10px; left: -15px; animation-delay: 0.5s; font-size: 28px; }
+        .h-4 { bottom: -10px; right: 10px; animation-delay: 1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        .passcode-title {
+            color: var(--text-main);
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.3);
+        }
+
+        .dots-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--text-main);
+            background: transparent;
+            transition: all 0.2s;
+        }
+
+        .dot.filled {
+            background: var(--text-main);
+            transform: scale(1.2);
+        }
+        
+        .hint-btn {
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            cursor: pointer;
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            display: inline-block;
+            border: 2px dashed var(--text-main);
+        }
+        
+        .hint-btn:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.8);
+        }
+
+        .numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px 30px;
+        }
+
+        .num-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: none;
+            color: var(--text-main);
+            font-size: 28px;
+            font-family: var(--font-main);
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .num-btn:active {
+            transform: scale(0.9);
+            background: var(--text-main);
+            color: var(--card-bg);
+        }
+
+        .error-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-2px, 0, 0); }
+            20%, 80% { transform: translate3d(4px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+            40%, 60% { transform: translate3d(6px, 0, 0); }
+        }
+
+        /* Main Content Screen */
+        #main-screen {
+            padding: 20px;
+            height: 100%;
+            box-sizing: border-box;
+            overflow-y: auto;
+            background: url('data:image/svg+xml;utf8,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><circle cx="2" cy="2" r="1.5" fill="%23ffb6c1" opacity="0.3"/></svg>');
+            position: relative;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 5;
+        }
+
+        .theme-toggle, .lock-btn, .mute-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            color: var(--text-main);
+            border-radius: 20px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle:active, .lock-btn:active, .mute-btn:active { transform: scale(0.9); }
+        .lock-btn { margin-left: 8px; }
+        .mute-btn { margin-left: 8px; }
+
+        .progress-container {
+            flex-grow: 1;
+            margin-left: 15px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: var(--text-main);
+            transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-main);
+            font-weight: 600;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-family: var(--font-cursive);
+            color: var(--text-main);
+            font-size: 34px;
+            margin: 0;
+            line-height: 1.2;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .letters-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding-bottom: 50px;
+            perspective: 1000px;
+        }
+
+        .letter-btn {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px 5px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 182, 193, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transform-style: preserve-3d;
+        }
+
+        .letter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--text-main);
+            opacity: 0.7;
+        }
+
+        .letter-btn:hover {
+            transform: translateY(-8px) rotateX(15deg);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.15);
+        }
+
+        .letter-btn.opened {
+            background: var(--bg-outer);
+            opacity: 0.7;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            transform: none;
+        }
+        
+        .letter-btn.opened .env-icon {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+        
+        .letter-btn.opened .wax-seal {
+            opacity: 0;
+            transform: translate(-50%, -50%) scale(2);
+            filter: blur(2px);
+        }
+
+        .env-wrapper {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .env-icon {
+            font-size: 28px;
+            color: var(--secondary);
+            transition: all 0.3s;
+        }
+        
+        .wax-seal {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #d32f2f;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset -2px -2px 4px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            z-index: 2;
+        }
+        .wax-seal::after {
+            content: '❤';
+            color: #ffb6c1;
+            font-size: 8px;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .letter-num {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .letter-modal {
+            width: 85%;
+            max-height: 80%;
+            background: var(--modal-bg);
+            border-radius: 15px;
+            padding: 25px;
+            position: relative;
+            transform: scale(0.8) translateY(50px) rotateX(-20deg);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            background-position: 0 30px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .modal-overlay.active .letter-modal {
+            transform: scale(1) translateY(0) rotateX(0);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: var(--text-main);
+            cursor: pointer;
+            background: var(--card-bg);
+            border-radius: 50%;
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .close-btn:active { transform: scale(0.9); }
+
+        .modal-title {
+            font-family: var(--font-cursive);
+            color: var(--text-main);
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-content {
+            font-family: var(--font-handwritten);
+            line-height: 1.4;
+            color: var(--text-main);
+            font-size: 24px;
+            padding-top: 5px;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
+        
+        /* Audio Player inside Modal */
+        .audio-wrapper {
+            margin-top: 20px; width: 100%; display: flex; flex-direction: column; align-items: center;
+        }
+        .audio-wrapper audio {
+            width: 100%; max-width: 250px; outline: none; border-radius: 30px;
+        }
+
+        /* Scratch-Off Canvas */
+        .scratch-container {
+            position: relative; width: 220px; height: 100px; margin: 20px auto;
+            border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .scratch-content {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            display:flex; align-items:center; justify-content:center;
+            background: linear-gradient(135deg, #ffd700, #ff8c00);
+            color: white; font-family: var(--font-cursive); font-size: 18px;
+            text-align:center; padding:10px; box-sizing:border-box;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+        .scratch-canvas {
+            position: absolute; top:0; left:0; width:100%; height:100%; z-index: 2;
+            cursor: crosshair; touch-action: none;
+        }
+
+        .modal-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            border-top: 1px dashed var(--primary);
+            padding-top: 15px;
+        }
+        .modal-nav-btn {
+            background: none; border: none; color: var(--text-main); font-family: var(--font-main); font-weight: 600; cursor: pointer; font-size: 16px; transition: color 0.2s;
+        }
+        .modal-nav-btn:hover { color: var(--secondary); }
+        .modal-nav-btn:disabled { color: var(--text-muted); opacity: 0.5; cursor: not-allowed; }
+        
+        /* Easter Egg / Finale Screens */
+        .fullscreen-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1s;
+        }
+        
+        .fullscreen-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .overlay-title {
+            color: white;
+            font-family: var(--font-cursive);
+            font-size: 42px;
+            text-align: center;
+            margin: 20px 10px;
+            text-shadow: 0 0 20px var(--text-main);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* Celebration Confetti */
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            z-index: 150;
+            opacity: 0;
+            border-radius: 2px;
+        }
+
+        /* Masonry Grid (9999) */
+        .masonry-grid {
+            column-count: 2;
+            column-gap: 10px;
+            padding: 20px;
+            width: 90%;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .masonry-item {
+            break-inside: avoid;
+            margin-bottom: 10px;
+        }
+        .masonry-item img {
+            width: 100%; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Interactive Map (8888) */
+        .memory-map {
+            width: 90%; height: 60vh; 
+            background: url('https://www.transparenttextures.com/patterns/cubes.png'), linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px; position: relative; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3); border: 4px solid white;
+        }
+        .map-pin {
+            position: absolute; width: 20px; height: 20px; background: #ff4d6d;
+            border-radius: 50%; transform: translate(-50%, -50%); cursor: pointer;
+            box-shadow: 0 0 10px rgba(255,77,109,0.8); animation: pinPulse 1.5s infinite;
+        }
+        @keyframes pinPulse {
+            0% { box-shadow: 0 0 0 0 rgba(255,77,109,0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(255,77,109,0); }
+            100% { box-shadow: 0 0 0 0 rgba(255,77,109,0); }
+        }
+        .map-popup {
+            position: absolute; background: white; padding: 10px; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3); font-family: var(--font-main);
+            font-size: 14px; font-weight: 600; color: var(--text-main); text-align: center;
+            transform: translate(-50%, -120%); opacity: 0; pointer-events: none; transition: 0.3s;
+            width: 140px; z-index: 10;
+        }
+        .map-popup img { width: 100%; border-radius: 5px; margin-bottom: 5px; }
+        .map-pin:hover .map-popup, .map-pin:active .map-popup { opacity: 1; pointer-events: all; transform: translate(-50%, -130%); }
+        .map-popup::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            border-width: 8px 8px 0; border-style: solid; border-color: white transparent transparent transparent;
+        }
+
+        /* Selfie Camera */
+        .camera-container {
+            width: 100%; max-width: 250px; margin: 15px auto;
+            border-radius: 15px; overflow: hidden; border: 4px solid white; display: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2); position: relative;
+        }
+        .camera-container video {
+            width: 100%; display: block; background: #000; transform: scaleX(-1);
+        }
+        .camera-container canvas {
+            display: none;
+        }
+        .capture-btn {
+            position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
+            width: 50px; height: 50px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; border: 3px solid #ffb6c1; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        .capture-btn:active { transform: translateX(-50%) scale(0.9); }
+        .captured-selfie {
+            width: 100%; max-width: 220px; border: 5px solid white; border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2); margin: 15px auto; display: none;
+            transform: rotate(-3deg);
+        }
+
+    </style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<div id="app-container">
+    <!-- Lock Screen -->
+    <div id="lock-screen">
+        <div class="cat-container">
+            <div class="cat-frame">
+                <img src="images.jpeg" alt="Cute Cat" class="s1">
+                <img src="dds.jpeg" alt="Cute Cat" class="s2">
+                <img src="ff.jpeg" alt="Cute Cat" class="s3">
+                <img src="gettyimages-173240099-612x612.jpg" alt="Cute Cat" class="s4">
+                <img src="imafes.jpeg" alt="Cute Cat" class="s5">
+                <img src="white-persian-cat-being-angry-260nw-388782298.webp" alt="Cute Cat" class="s6">
+            </div>
+            <i class="fa-solid fa-heart heart-deco h-1"></i>
+            <i class="fa-solid fa-heart heart-deco h-2"></i>
+            <i class="fa-solid fa-heart heart-deco h-3"></i>
+            <i class="fa-solid fa-heart heart-deco h-4"></i>
+        </div>
+        
+        <div class="passcode-title">Enter a passcode</div>
+        
+        <div class="dots-container" id="dots">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <div class="hint-btn" onclick="openOverlay('hint-overlay')">Need a hint? 💡</div>
+        
+        <div class="numpad">
+            <button class="num-btn" onclick="press(1)">1</button>
+            <button class="num-btn" onclick="press(2)">2</button>
+            <button class="num-btn" onclick="press(3)">3</button>
+            <button class="num-btn" onclick="press(4)">4</button>
+            <button class="num-btn" onclick="press(5)">5</button>
+            <button class="num-btn" onclick="press(6)">6</button>
+            <button class="num-btn" onclick="press(7)">7</button>
+            <button class="num-btn" onclick="press(8)">8</button>
+            <button class="num-btn" onclick="press(9)">9</button>
+            <button class="num-btn" onclick="press('*')"><i class="fa-solid fa-star" style="font-size:16px;"></i></button>
+            <button class="num-btn" onclick="press(0)">0</button>
+            <button class="num-btn" onclick="press('#')"><i class="fa-solid fa-delete-left" style="font-size:18px;"></i></button>
+        </div>
+    </div>
+
+    <!-- Main Screen -->
+    <div id="main-screen">
+        <div class="top-bar">
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode"><i class="fa-solid fa-moon"></i></button>
+            <button class="mute-btn" onclick="toggleMute()" title="Toggle Music"><i class="fa-solid fa-volume-high"></i></button>
+            <button class="lock-btn" onclick="lockDiary()" title="Lock Diary"><i class="fa-solid fa-lock"></i></button>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <div style="margin-left:10px;">
+                <div class="progress-text" id="progress-text">0 / 18</div>
+            </div>
+        </div>
+
+        <div class="header">
+            <h1>Happy 18th Birthday!</h1>
+            <p>18 letters for my favorite person 💌</p>
+        </div>
+
+        <div class="letters-grid" id="letters-grid">
+            <!-- Letters injected via JS -->
+        </div>
+        <!-- Hidden YouTube Player for Autoplay Audio -->
+        <div id="yt-player" style="position:absolute; top:-9999px; left:-9999px; width:1px; height:1px;"></div>
+    </div>
+
+    <!-- Letter Modal Overlay -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="letter-modal">
+            <div class="close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></div>
+            <h2 class="modal-title" id="modal-title">Letter 1</h2>
+            <div class="modal-content" id="modal-content"></div>
+            
+            <div id="modal-audio-container" style="display:none;"></div>
+            <div id="modal-scratch-container" style="display:none;"></div>
+            
+            <div id="modal-image-container" style="margin-top: 15px; text-align: center; display: none; opacity: 0; transition: opacity 1s;">
+                <img id="modal-image" src="" style="max-width: 100%; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+            </div>
+            <div class="modal-nav">
+                <button class="modal-nav-btn" id="btn-prev-letter" onclick="prevLetter()"><i class="fa-solid fa-arrow-left"></i> Prev</button>
+                <button class="modal-nav-btn" id="btn-next-letter" onclick="nextLetter()">Next <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hint Overlay -->
+    <div id="hint-overlay" class="fullscreen-overlay" style="z-index: 250;">
+        <div class="letter-modal" style="text-align: center; max-width: 320px; padding: 30px 20px;">
+            <div class="close-btn" onclick="closeOverlay('hint-overlay')"><i class="fa-solid fa-xmark"></i></div>
+            <h2 class="modal-title" style="margin-bottom: 10px;">Password Hints 🕵️</h2>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px; font-family: var(--font-main);">Use these clues to unlock the diary!</p>
+            
+            <ul style="text-align: left; font-size: 16px; line-height: 1.4; color: var(--text-main); font-family: var(--font-main); list-style: none; padding: 0; margin: 0;">
+                <li style="margin-bottom: 10px; padding: 10px; background: var(--bg-outer); border-radius: 10px; border: 1px dashed var(--primary);">🔑 <strong>Clue 1:</strong> It is exactly 4 digits long.</li>
+                <li style="margin-bottom: 10px; padding: 10px; background: var(--bg-outer); border-radius: 10px; border: 1px dashed var(--primary);">🎂 <strong>Clue 2:</strong> It's the age you are turning today!</li>
+                <li style="margin-bottom: 10px; padding: 10px; background: var(--bg-outer); border-radius: 10px; border: 1px dashed var(--primary);">🔁 <strong>Clue 3:</strong> You have to type it twice...</li>
+                <li style="margin-bottom: 10px; padding: 10px; background: var(--text-main); color: white; border-radius: 10px; text-align: center; font-weight: bold;">🎯 <strong>Answer:</strong> 1818</li>
+            </ul>
+            
+            <button class="num-btn" style="width: 100%; height: auto; padding: 12px; border-radius: 20px; margin-top: 20px; font-size: 16px;" onclick="closeOverlay('hint-overlay')">I got it!</button>
+        </div>
+    </div>
+
+    <!-- Grand Finale Screen -->
+    <div id="finale-screen" class="fullscreen-overlay">
+        <i class="fa-solid fa-cake-candles" style="color: #ffb6c1; font-size: 60px; margin-bottom: 10px;"></i>
+        <div class="overlay-title" style="font-size: 32px;">Happy 18th Birthday!</div>
+        <p style="color: #ddd; text-align: center; padding: 0 20px; font-size: 16px; margin-bottom: 15px; line-height: 1.4; font-family: var(--font-main);">You've unlocked all your letters.<br>Welcome to adulthood! 💖</p>
+        
+        <!-- Live Selfie Feature -->
+        <button class="num-btn" id="start-camera-btn" style="width: auto; height: auto; padding: 10px 25px; border-radius: 20px; margin-bottom: 10px; font-size: 16px;" onclick="startCamera()">Take Birthday Selfie 📸</button>
+        <div class="camera-container" id="camera-container">
+            <video id="camera-video" autoplay playsinline></video>
+            <canvas id="camera-canvas"></canvas>
+            <div class="capture-btn" onclick="captureSelfie()"></div>
+        </div>
+        <img id="captured-selfie" class="captured-selfie" src="">
+
+        <button class="num-btn" style="width: auto; height: auto; padding: 10px 25px; border-radius: 20px; margin-top: 10px; font-size: 16px;" onclick="exportPDF()">Download Keepsake 📄</button>
+        <button class="num-btn" style="width: auto; height: auto; padding: 10px 25px; border-radius: 20px; margin-top: 10px; font-size: 16px; background: rgba(255,255,255,0.2); color: white;" onclick="closeOverlay('finale-screen')">Revisit Letters</button>
+    </div>
+
+    <!-- Easter Egg 0000 Screen -->
+    <div id="easter-egg-0000" class="fullscreen-overlay">
+        <i class="fa-solid fa-video" style="color: #ffb6c1; font-size: 80px; margin-bottom: 20px;"></i>
+        <div class="overlay-title">Secret Vault 🤫</div>
+        <p style="color: #ddd; text-align: center; padding: 0 30px; font-size: 18px; line-height: 1.6; font-family: var(--font-main);">We could embed a funny video here!</p>
+        <button class="num-btn" style="width: auto; height: auto; padding: 12px 30px; border-radius: 25px; margin-top: 30px; font-size: 18px;" onclick="closeOverlay('easter-egg-0000')">Close Vault</button>
+    </div>
+
+    <!-- Easter Egg 8888 Screen (Memory Map) -->
+    <div id="easter-egg-8888" class="fullscreen-overlay">
+        <div class="overlay-title" style="margin-bottom: 5px;">Memory Map 🗺️</div>
+        <p style="color: #ddd; text-align: center; font-size: 14px; margin-bottom: 15px; font-family: var(--font-main);">Tap the pins to remember...</p>
+        
+        <div class="memory-map">
+            <div class="map-pin" style="top: 30%; left: 20%;">
+                <div class="map-popup">
+                    <img src="images.jpeg">
+                    Our first trip! 🏖️
+                </div>
+            </div>
+            <div class="map-pin" style="top: 60%; left: 70%;">
+                <div class="map-popup">
+                    <img src="images.jpeg">
+                    Favorite cafe ☕
+                </div>
+            </div>
+            <div class="map-pin" style="top: 20%; left: 80%;">
+                <div class="map-popup">
+                    <img src="images.jpeg">
+                    Graduation 🎓
+                </div>
+            </div>
+        </div>
+        
+        <button class="num-btn" style="width: auto; height: auto; padding: 12px 30px; border-radius: 25px; margin-top: 20px; font-size: 18px;" onclick="closeOverlay('easter-egg-8888')">Return</button>
+    </div>
+
+    <!-- Easter Egg 9999 Screen -->
+    <div id="easter-egg-9999" class="fullscreen-overlay">
+        <div class="overlay-title" style="margin-bottom: 5px;">Time Machine 🕰️</div>
+        
+        <div class="masonry-grid" id="masonry-grid">
+            <div class="masonry-item"><img src="images.jpeg"></div>
+            <div class="masonry-item"><img src="images.jpeg"></div>
+            <div class="masonry-item"><img src="images.jpeg"></div>
+            <div class="masonry-item"><img src="images.jpeg"></div>
+        </div>
+        
+        <button class="num-btn" style="width: auto; height: auto; padding: 12px 30px; border-radius: 25px; margin-top: 20px; font-size: 18px;" onclick="closeOverlay('easter-egg-9999')">Return to Present</button>
+    </div>
+</div>
+
+<script>
+    // --- PWA Registration ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                reg.update();
+            }).catch(err => console.log('SW Registration failed', err));
+        });
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            window.location.reload();
+        });
+    }
+
+    // --- Toast Notifications ---
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3500);
+    }
+
+    // --- Audio System ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    
+    function initAudio() {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTone(freq, type, duration, vol=0.1) {
+        try {
+            initAudio();
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function playClick() { playTone(600, 'sine', 0.1, 0.03); }
+    function playOpenSound() { 
+        playTone(400, 'triangle', 0.2, 0.05); 
+        setTimeout(() => playTone(600, 'sine', 0.3, 0.05), 50); 
+    }
+    function playUnlockSound() {
+        playTone(523.25, 'sine', 0.2, 0.1); 
+        setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100);
+        setTimeout(() => playTone(783.99, 'sine', 0.4, 0.1), 200);
+    }
+
+    // --- State Management (Local Storage) ---
+    const grid = document.getElementById('letters-grid');
+    let openedLetters = new Set(JSON.parse(localStorage.getItem('openedLetters') || '[]'));
+
+    // --- Time Lock Configuration ---
+    // Change this to the actual birthday! Format: YYYY-MM-DDTHH:mm:00
+    // Currently set to yesterday for testing so you can open it!
+    const BIRTHDAY_DATE = new Date("2026-06-26T00:00:00"); 
+
+    // --- Letter Content ---
+    const letterData = [
+        { 
+            text: "Happy 18th Birthday! 🎉\n\nI recorded a little voice note for you. Listen below!", 
+            img: null,
+            audio: "https://actions.google.com/sounds/v1/water/rain_on_roof.ogg" // Placeholder audio
+        },
+        { 
+            text: "Letter 2\n\nI got a special gift for you...", 
+            img: null,
+            scratchOff: "Free Dinner on me! 🍕"
+        },
+    ];
+    while(letterData.length < 17) {
+        letterData.push({ text: `Letter ${letterData.length + 1}\n\nWrite something special here for this milestone!`, img: null });
+    }
+    letterData.push({ 
+        text: "Letter 18\n\nWelcome to adulthood! I love you so much and I can't wait to see what the future holds for you! ❤️\n\nHere's a cute memory to celebrate!", 
+        img: "images.jpeg" 
+    });
+
+    // Initialize UI
+    function initUI() {
+        for (let i = 1; i <= 18; i++) {
+            const btn = document.createElement('div');
+            btn.className = 'letter-btn';
+            btn.innerHTML = `
+                <div class="env-wrapper">
+                    <i class="fa-solid fa-envelope env-icon"></i>
+                    <div class="wax-seal"></div>
+                </div>
+                <div class="letter-num">#${i}</div>
+            `;
+            btn.onclick = () => openModal(i);
+            grid.appendChild(btn);
+        }
+
+        openedLetters.forEach(index => {
+            const btn = grid.children[index - 1];
+            if (btn) {
+                btn.classList.add('opened');
+                btn.querySelector('.env-icon').classList.replace('fa-envelope', 'fa-envelope-open-text');
+            }
+        });
+        updateProgress();
+    }
+    
+    initUI();
+
+    function updateProgress() {
+        const count = openedLetters.size;
+        document.getElementById('progress-bar').style.width = `${(count / 18) * 100}%`;
+        document.getElementById('progress-text').innerText = `${count} / 18`;
+        
+        if (count === 18 && !document.getElementById('finale-screen').classList.contains('active')) {
+            setTimeout(() => {
+                document.getElementById('finale-screen').classList.add('active');
+                playUnlockSound();
+                fireConfetti(100);
+            }, 1500);
+        }
+    }
+
+    function lockDiary() {
+        playClick();
+        currentInput = "";
+        wrongAttempts = 0;
+        updateDots();
+        
+        const lockScreen = document.getElementById('lock-screen');
+        lockScreen.style.display = 'flex';
+        void lockScreen.offsetWidth;
+        lockScreen.classList.remove('unlocked');
+        
+        if (window.ytPlayer && typeof window.ytPlayer.pauseVideo === 'function') {
+            window.ytPlayer.pauseVideo();
+        }
+    }
+
+    // --- Passcode Logic ---
+    const CORRECT_PASSCODE = "1818"; 
+    let currentInput = "";
+    let wrongAttempts = 0;
+    
+    function press(num) {
+        playClick();
+        if(currentInput.length >= 4 && num !== '#') return;
+
+        if (num === '#') {
+            currentInput = currentInput.slice(0, -1);
+            updateDots();
+            return;
+        }
+
+        if (num === '*') return;
+
+        currentInput += num;
+        updateDots();
+
+        if (currentInput.length === 4) {
+            setTimeout(checkPasscode, 200);
+        }
+    }
+
+    function updateDots() {
+        const dots = document.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            if (index < currentInput.length) {
+                dot.classList.add('filled');
+            } else {
+                dot.classList.remove('filled');
+            }
+        });
+    }
+
+    function checkPasscode() {
+        if (currentInput === CORRECT_PASSCODE) {
+            playUnlockSound();
+            wrongAttempts = 0;
+            const lockScreen = document.getElementById('lock-screen');
+            lockScreen.classList.add('unlocked');
+            fireConfetti(30);
+            
+            if (window.ytPlayer && typeof window.ytPlayer.playVideo === 'function') {
+                window.ytPlayer.playVideo();
+            }
+            
+            openedLetters.forEach(index => {
+                const btn = grid.children[index - 1];
+                if (btn) {
+                    btn.classList.add('opened');
+                    btn.querySelector('.env-icon').classList.replace('fa-envelope', 'fa-envelope-open-text');
+                }
+            });
+            updateProgress();
+            
+            setTimeout(() => lockScreen.style.display = 'none', 600);
+        } else if (currentInput === "0000") {
+            playUnlockSound();
+            document.getElementById('easter-egg-0000').classList.add('active');
+            currentInput = "";
+            updateDots();
+        } else if (currentInput === "8888") {
+            playUnlockSound();
+            document.getElementById('easter-egg-8888').classList.add('active');
+            currentInput = "";
+            updateDots();
+        } else if (currentInput === "9999") {
+            playUnlockSound();
+            document.getElementById('easter-egg-9999').classList.add('active');
+            currentInput = "";
+            updateDots();
+        } else {
+            const dotsContainer = document.getElementById('dots');
+            dotsContainer.classList.add('error-shake');
+            playTone(200, 'sawtooth', 0.3, 0.1);
+            
+            wrongAttempts++;
+            if (wrongAttempts >= 3) {
+                const hintBtn = document.querySelector('.hint-btn');
+                if (hintBtn) {
+                    hintBtn.classList.add('error-shake');
+                    setTimeout(() => hintBtn.classList.remove('error-shake'), 400);
+                }
+            }
+            
+            setTimeout(() => {
+                dotsContainer.classList.remove('error-shake');
+                currentInput = "";
+                updateDots();
+            }, 400);
+        }
+    }
+
+    // --- Theme & Mute Toggle ---
+    let isDark = localStorage.getItem('darkMode') === 'true';
+    if(isDark) applyDarkTheme();
+
+    function applyDarkTheme() {
+        document.body.classList.toggle('dark-theme', isDark);
+        const icon = document.querySelector('.theme-toggle i');
+        icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    }
+
+    function toggleTheme() {
+        playClick();
+        isDark = !isDark;
+        localStorage.setItem('darkMode', isDark);
+        applyDarkTheme();
+    }
+    
+    let isMuted = false;
+    function toggleMute() {
+        playClick();
+        isMuted = !isMuted;
+        const icon = document.querySelector('.mute-btn i');
+        if (isMuted) {
+            icon.className = 'fa-solid fa-volume-xmark';
+            if (window.ytPlayer && typeof window.ytPlayer.mute === 'function') window.ytPlayer.mute();
+        } else {
+            icon.className = 'fa-solid fa-volume-high';
+            if (window.ytPlayer && typeof window.ytPlayer.unMute === 'function') window.ytPlayer.unMute();
+        }
+    }
+
+    // --- Modal, Letter & Swipe Logic ---
+    let typeInterval;
+    let currentModalIndex = 1;
+
+    function openModal(index) {
+        // Time Lock Logic for Letter 18
+        if (index === 18 && new Date() < BIRTHDAY_DATE) {
+            showToast("No cheating! ⏳ Come back on your Birthday!");
+            const btn = grid.children[index - 1];
+            btn.classList.add('error-shake');
+            playTone(200, 'sawtooth', 0.3, 0.1);
+            setTimeout(() => btn.classList.remove('error-shake'), 400);
+            return;
+        }
+
+        playOpenSound();
+        currentModalIndex = index;
+        
+        document.getElementById('btn-prev-letter').disabled = (index === 1);
+        document.getElementById('btn-next-letter').disabled = (index === 18);
+        
+        const btn = grid.children[index - 1];
+        if(!btn.classList.contains('opened')) {
+            btn.classList.add('opened');
+            btn.querySelector('.env-icon').classList.replace('fa-envelope', 'fa-envelope-open-text');
+            openedLetters.add(index);
+            localStorage.setItem('openedLetters', JSON.stringify([...openedLetters]));
+            updateProgress();
+        }
+
+        document.getElementById('modal-title').innerText = `Letter ${index}`;
+        const contentEl = document.getElementById('modal-content');
+        const imgContainer = document.getElementById('modal-image-container');
+        const imgEl = document.getElementById('modal-image');
+        const audioContainer = document.getElementById('modal-audio-container');
+        const scratchContainer = document.getElementById('modal-scratch-container');
+        
+        imgContainer.style.display = 'none';
+        imgContainer.style.opacity = '0';
+        audioContainer.style.display = 'none';
+        audioContainer.innerHTML = '';
+        scratchContainer.style.display = 'none';
+        scratchContainer.innerHTML = '';
+
+        document.getElementById('modal-overlay').classList.add('active');
+
+        const data = letterData[index - 1];
+        typeWriter(data.text, contentEl, () => {
+            // Post-typewriter effects
+            if (data.audio) {
+                audioContainer.style.display = 'block';
+                audioContainer.innerHTML = `<div class="audio-wrapper"><audio controls src="${data.audio}"></audio></div>`;
+            }
+            if (data.scratchOff) {
+                scratchContainer.style.display = 'block';
+                scratchContainer.innerHTML = `
+                    <div class="scratch-container">
+                        <div class="scratch-content">${data.scratchOff}</div>
+                        <canvas class="scratch-canvas" id="scratch-canvas"></canvas>
+                    </div>
+                `;
+                initScratchCard();
+            }
+            if (data.img) {
+                imgEl.src = data.img;
+                imgContainer.style.display = 'block';
+                setTimeout(() => imgContainer.style.opacity = '1', 50);
+            }
+        });
+    }
+    
+    // Scratch Card Logic
+    function initScratchCard() {
+        const canvas = document.getElementById('scratch-canvas');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        
+        ctx.fillStyle = '#c0c0c0';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.font = "bold 16px var(--font-main)";
+        ctx.fillStyle = "#888";
+        ctx.textAlign = "center";
+        ctx.fillText("SCRATCH HERE", canvas.width/2, canvas.height/2 + 6);
+
+        let isDrawing = false;
+        
+        function getMousePos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+        
+        function scratch(e) {
+            if (!isDrawing) return;
+            if (e.cancelable) e.preventDefault();
+            const pos = getMousePos(e);
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, 15, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        canvas.addEventListener('mousedown', () => isDrawing = true);
+        canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); }, {passive:false});
+        window.addEventListener('mouseup', () => isDrawing = false);
+        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('mousemove', scratch);
+        canvas.addEventListener('touchmove', scratch, {passive:false});
+    }
+
+    function nextLetter() {
+        if (currentModalIndex < 18) openModal(currentModalIndex + 1);
+    }
+    
+    function prevLetter() {
+        if (currentModalIndex > 1) openModal(currentModalIndex - 1);
+    }
+    
+    // Swipe Gestures
+    let touchstartX = 0;
+    let touchendX = 0;
+    const modalEl = document.getElementById('modal-overlay');
+
+    modalEl.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    }, {passive: true});
+
+    modalEl.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        if (touchendX < touchstartX - 50) nextLetter(); // Swiped left
+        if (touchendX > touchstartX + 50) prevLetter(); // Swiped right
+    }, {passive: true});
+
+    function typeWriter(text, element, callback) {
+        const chars = Array.from(text);
+        let i = 0;
+        element.innerHTML = '';
+        clearInterval(typeInterval);
+        
+        typeInterval = setInterval(() => {
+            if (i < chars.length) {
+                let char = chars[i];
+                if (char === '\n') element.innerHTML += '<br>';
+                else element.innerHTML += char;
+                i++;
+                if (i % 3 === 0) playTone(800 + Math.random()*200, 'triangle', 0.02, 0.01);
+            } else {
+                clearInterval(typeInterval);
+                if (callback) callback();
+            }
+        }, 35);
+    }
+
+    function closeModal() {
+        playClick();
+        document.getElementById('modal-overlay').classList.remove('active');
+        clearInterval(typeInterval);
+    }
+    
+    function openOverlay(id) {
+        playClick();
+        document.getElementById(id).classList.add('active');
+    }
+
+    function closeOverlay(id) {
+        playClick();
+        document.getElementById(id).classList.remove('active');
+        if(id === 'finale-screen') stopCamera(); // Stop camera if leaving finale screen
+    }
+    
+    // --- Live Selfie Camera ---
+    let selfieStream = null;
+    let selfieDataUrl = null;
+    
+    async function startCamera() {
+        playClick();
+        const btn = document.getElementById('start-camera-btn');
+        const container = document.getElementById('camera-container');
+        const video = document.getElementById('camera-video');
+        
+        try {
+            selfieStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+            video.srcObject = selfieStream;
+            btn.style.display = 'none';
+            container.style.display = 'block';
+        } catch(err) {
+            showToast("Camera access denied or unavailable! 📸");
+        }
+    }
+    
+    function captureSelfie() {
+        playClick();
+        playTone(900, 'sine', 0.1, 0.1); // shutter sound
+        const video = document.getElementById('camera-video');
+        const canvas = document.getElementById('camera-canvas');
+        const img = document.getElementById('captured-selfie');
+        const container = document.getElementById('camera-container');
+        
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        // Mirror the drawing because the video is mirrored
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        selfieDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        img.src = selfieDataUrl;
+        
+        stopCamera();
+        container.style.display = 'none';
+        img.style.display = 'block';
+        showToast("Selfie Captured! It will be added to your PDF. 🎉");
+    }
+
+    function stopCamera() {
+        if(selfieStream) {
+            selfieStream.getTracks().forEach(track => track.stop());
+            selfieStream = null;
+        }
+    }
+
+    // --- Export PDF ---
+    function exportPDF() {
+        playClick();
+        const btn = document.querySelector('#finale-screen button[onclick="exportPDF()"]');
+        const originalText = btn.innerText;
+        btn.innerText = "Generating PDF... ⏳";
+        
+        const pdfContainer = document.createElement('div');
+        pdfContainer.style.padding = '40px';
+        pdfContainer.style.fontFamily = "'Caveat', cursive";
+        pdfContainer.style.fontSize = '24px';
+        pdfContainer.style.color = '#d35467';
+        pdfContainer.style.backgroundColor = '#ffeef2';
+        
+        pdfContainer.innerHTML = `<h1 style="text-align:center; font-family:'Pacifico', cursive; margin-bottom:50px; font-size:40px;">Happy 18th Birthday!</h1>`;
+        
+        letterData.forEach((data, index) => {
+            const letterDiv = document.createElement('div');
+            letterDiv.style.marginBottom = '60px';
+            letterDiv.style.pageBreakInside = 'avoid';
+            letterDiv.innerHTML = `<h2 style="font-family:'Pacifico', cursive; border-bottom: 2px dashed #ffb6c1; padding-bottom:10px;">Letter ${index + 1}</h2>
+                                   <p style="white-space: pre-wrap; line-height:1.5; margin-top:20px;">${data.text}</p>`;
+            
+            if(data.scratchOff) {
+                letterDiv.innerHTML += `<p style="margin-top:15px; font-weight:bold;">Surprise Gift: ${data.scratchOff}</p>`;
+            }
+            if(data.img) {
+                letterDiv.innerHTML += `<img src="${data.img}" style="max-width:100%; border-radius:10px; margin-top:15px; border: 4px solid white; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">`;
+            }
+            pdfContainer.appendChild(letterDiv);
+        });
+
+        // Add selfie if taken
+        if(selfieDataUrl) {
+            const selfieDiv = document.createElement('div');
+            selfieDiv.style.pageBreakInside = 'avoid';
+            selfieDiv.innerHTML = `<h2 style="font-family:'Pacifico', cursive; border-bottom: 2px dashed #ffb6c1; padding-bottom:10px; margin-top:40px;">Birthday Selfie 📸</h2>
+                                   <img src="${selfieDataUrl}" style="max-width:80%; border-radius:10px; margin-top:25px; border: 8px solid white; box-shadow: 0 8px 16px rgba(0,0,0,0.2); transform: rotate(-3deg); display: block; margin-left: auto; margin-right: auto;">`;
+            pdfContainer.appendChild(selfieDiv);
+        }
+        
+        const opt = {
+          margin:       0.5,
+          filename:     '18th-Birthday-Letters.pdf',
+          image:        { type: 'jpeg', quality: 0.98 },
+          html2canvas:  { scale: 2, useCORS: true },
+          jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+        
+        html2pdf().set(opt).from(pdfContainer).save().then(() => {
+            btn.innerText = originalText;
+            fireConfetti(30);
+        });
+    }
+
+    // --- Interactive Confetti ---
+    document.getElementById('main-screen').addEventListener('click', (e) => {
+        if(e.target.closest('.letter-btn') || e.target.closest('button')) return;
+        
+        const rect = document.getElementById('app-container').getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        if (x >= 0 && x <= rect.width && y >= 0 && y <= rect.height) {
+            spawnConfettiAt(x, y, 5);
+            playTone(900, 'sine', 0.05, 0.02);
+        }
+    });
+
+    function spawnConfettiAt(x, y, amount) {
+        const colors = ['#ffb6c1', '#ff9fb2', '#ffd700', '#87cefa', '#dda0dd'];
+        const container = document.getElementById('app-container');
+        
+        for (let i = 0; i < amount; i++) {
+            const conf = document.createElement('div');
+            conf.className = 'confetti';
+            conf.style.left = x + 'px';
+            conf.style.top = y + 'px';
+            conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            container.appendChild(conf);
+
+            const duration = Math.random() * 1.5 + 0.5;
+            const tx = (Math.random() - 0.5) * 300;
+            const ty = Math.random() * 300 + 100;
+            const rot = Math.random() * 720 - 360;
+            
+            conf.animate([
+                { transform: 'translate3d(0,0,0) rotate(0)', opacity: 1 },
+                { transform: `translate3d(${tx}px, ${ty}px, 0) rotate(${rot}deg)`, opacity: 0 }
+            ], {
+                duration: duration * 1000,
+                easing: 'cubic-bezier(.37,0,.63,1)',
+                fill: 'forwards'
+            });
+
+            setTimeout(() => conf.remove(), duration * 1000);
+        }
+    }
+
+    function fireConfetti(amount = 50) {
+        const rect = document.getElementById('app-container').getBoundingClientRect();
+        for (let i = 0; i < amount; i++) {
+            setTimeout(() => {
+                const x = Math.random() * rect.width;
+                spawnConfettiAt(x, -20, 1);
+            }, i * 30);
+        }
+    }
+
+    // --- YouTube API for Autoplay Audio ---
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    window.ytPlayer = null;
+    function onYouTubeIframeAPIReady() {
+        window.ytPlayer = new YT.Player('yt-player', {
+            height: '1',
+            width: '1',
+            videoId: 'izbydia9jz4',
+            playerVars: {
+                'autoplay': 0, 
+                'controls': 0,
+                'rel': 0,
+                'showinfo': 0,
+                'loop': 1,
+                'playlist': 'izbydia9jz4',
+                'playsinline': 1
+            }
+        });
+    }
+</script>
+</body>
+</html>
